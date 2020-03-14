@@ -1,6 +1,7 @@
 **/DS_Store
 node_modules
 .env
+config/keys.js
 # dependencies
 /node_modules
 /.pnp
