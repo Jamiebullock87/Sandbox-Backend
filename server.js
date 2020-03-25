@@ -26,6 +26,9 @@ mongoose
 .then(() => console.log("MongoDB successfully connected"))
 .catch(err => console.log(err));
 
+// Make Mongoose use `findOneAndUpdate()`.
+mongoose.set('useFindAndModify', false);
+
 // Passport middleware
 app.use(passport.initialize());
 // Passport config

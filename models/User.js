@@ -2,9 +2,25 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 // Create Schema
 const UserSchema = new Schema({
-    name: {
+    firstName: {
         type: String,
-        required: false
+        required: false,
+        default: '',
+    },
+    lastName: {
+        type: String,
+        required: false,
+        default: '',
+    },
+    image: {
+        type: String,
+        required: false,
+        default: '',
+    },
+    whatTheme: {
+        type: String,
+        required: false,
+        default: 'dark',
     },
     email: {
         type: String,
@@ -14,13 +30,10 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    date: {
-        type: Date,
-        default: Date.now
-    },
     isSuper: {
         type: Boolean,
-        default: false
+        default: false,
+        required: false
     }
-});
+}, {timestamps: true});
 module.exports = User = mongoose.model("users", UserSchema);
