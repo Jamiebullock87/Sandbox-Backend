@@ -15,6 +15,21 @@ app.use(
     cors()
 );
 app.use(bodyParser.json());
+
+// Socket IO 
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+io.on('connection', function(socket){
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+        console.log('User Disconnected');
+    });
+    socket.on('message', (message, callback) => {
+        callback(message);
+    });
+});
+io.listen(8000);
+
 // DB Config
 const db = require('./config/keys').mongoURI;
 // Connect to MongoDB
@@ -33,6 +48,7 @@ mongoose.set('useFindAndModify', false);
 app.use(passport.initialize());
 // Passport config
 require('./config/passport')(passport);
+
 // API Routes
 app.use('/api/users', users);
 
