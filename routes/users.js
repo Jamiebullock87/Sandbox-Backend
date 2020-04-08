@@ -125,6 +125,21 @@ router.post("/logout", (req, res) => {
     });
 });
 
+// @route POST api/users/logout
+// @desc log out user and invalidate session
+// @access Private
+router.post("/logout", (req, res) => {
+    const id = req.headers.authorization.split('Bearer ')[1];
+    Session.deleteOne({token: id}, (err, result) => {
+        if (err) {
+            res.send(err);
+        } else {
+            res.send(result);
+            console.log('removed session', result)
+        }
+    });
+});
+
 // @route GET api/users/getprofile
 // @desc get the user profile and return the data
 // @access Private
@@ -155,6 +170,7 @@ router.post("/saveprofile", (req, res) => {
             console.log("Something wrong when updating data!");
         }
         console.log(doc);
+        return res.json(doc);
     });
     
 });
