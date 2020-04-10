@@ -83,21 +83,28 @@ router.post("/login", (req, res) => {
                         // create session if token gets signed
                         const date = new Date();
                         date.setDate(date.getDate() + 1);
+                        console.log(user);
+                        const validImg = user.image != null && user.image.length > 0 ? user.image : '';
                         const addSession = new Session({
                             useragent: req.headers['user-agent'],
+                            email: email,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            image: validImg,
+                            whatTheme: user.whatTheme,
                             ip: req.connection.remoteAddress,
                             token: token,
                             valid: true,
                             expiry: date.toISOString() // expire day after creation if not logged out
                         });
-                        
                         addSession.save(function (err, session) {
                             if (err) return console.error(err);
                             console.log('session created');
                         });
                         res.json({
                             success: true,
-                            token: "Bearer " + token
+                            token: "Bearer " + token,
+                            theme: user.whatTheme
                         });
                     }
                 );
@@ -123,56 +130,6 @@ router.post("/logout", (req, res) => {
             console.log('removed session', result)
         }
     });
-});
-
-// @route POST api/users/logout
-// @desc log out user and invalidate session
-// @access Private
-router.post("/logout", (req, res) => {
-    const id = req.headers.authorization.split('Bearer ')[1];
-    Session.deleteOne({token: id}, (err, result) => {
-        if (err) {
-            res.send(err);
-        } else {
-            res.send(result);
-            console.log('removed session', result)
-        }
-    });
-});
-
-// @route GET api/users/getprofile
-// @desc get the user profile and return the data
-// @access Private
-router.post("/getprofile", (req, res) => {
-    const email = req.body.email;
-    // Adventure.findOne({ type: 'iphone' }, function (err, adventure) {});
-    User.findOne({ email: email }).then((user) => {
-        return res.json(user);
-    })
-});
-
-// @route POST api/users/saveprofile
-// @desc log out user and invalidate session
-// @access Private
-router.post("/saveprofile", (req, res) => {
-    const email = req.body.email;
-    console.log(req.body);
-    // User.findOne({ email }).then((user) => {
-    //     console.log(user);
-    // })
-    User.findOneAndUpdate({email: email}, {$set:{
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        image: req.body.image,
-        whatTheme: req.body.whatTheme
-    }}, {new: true}, (err, doc) => {
-        if (err) {
-            console.log("Something wrong when updating data!");
-        }
-        console.log(doc);
-        return res.json(doc);
-    });
-    
 });
 
 module.exports = router;
