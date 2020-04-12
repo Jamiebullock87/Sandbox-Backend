@@ -1,7 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+
 // Create Schema
 const SessionSchema = new Schema({
+    createdAt: {
+        type: Date,
+        default: Date.now,
+        index: { expires: '43200s' } // 12 hour sessions
+    },
     useragent: {
         type: String,
         required: true
@@ -38,11 +44,6 @@ const SessionSchema = new Schema({
         type: Boolean,
         required: true
     },
-    expiry: {
-        type: Date,
-        required: true
-    }
-}, {timestamps: true});
+});
 
-SessionSchema.index( ({ expiry: 1 }, { expireAfterSeconds : 0 }) )
 module.exports = Session = mongoose.model("sessions", SessionSchema);

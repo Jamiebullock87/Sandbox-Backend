@@ -12,10 +12,10 @@ const User = require("../models/User");
 // Load Session mode
 const Session = require("../models/Session");
 
-// @route GET api/restricted/dashboard
+// @route GET api/restricted/authcheck
 // @desc simple auth check to access dashboard
 // @access Private
-router.get("/dashboard", passport.authenticate('jwt', {session: false}), (req, res) => {
+router.get("/authcheck", passport.authenticate('jwt', {session: false}), (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
@@ -23,16 +23,36 @@ router.get("/dashboard", passport.authenticate('jwt', {session: false}), (req, r
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('dashboard retrieved session - restricted route');
             return res.sendStatus(200);
-            // User.findOne({ email: session.email }).then((user) => {
-            //     console.log(user);
-            //     return res.json({
-            //         firstName: user.firstName,
-            //         lastName: user.lastName
-            //     });
-            // })
         }
     })
 });
+
+// @route GET api/restricted/getstats
+// @desc fetch the data to populate the dashboard
+// @access Private
+router.post("/getstats", passport.authenticate('jwt', {session: false}), (req, res) => {
+    const token = req.headers.authorization.split(' ')[1];
+    const ua = req.headers['user-agent'];
+    const ip = req.connection.remoteAddress;
+    console.log(req);
+
+    Session.findOne({ token: token }).then((session) => {
+        if (ip === session.ip && ua == session.useragent && session.valid) {
+            console.log('dashboard data retrieved session - restricted route');
+            Promise.all([
+                User.find().estimatedDocumentCount(),
+                Session.find().estimatedDocumentCount()
+            ]).then(counts => {
+                console.log(counts);
+                res.json({
+                    numberOfUsers: counts[0],
+                    numberLoggedIn: counts[1]
+                })
+            })
+        }
+    })
+});
+
 
 // @route GET api/restricted/getprofile
 // @desc get the user profile and return the data

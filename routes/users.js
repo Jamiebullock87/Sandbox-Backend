@@ -86,6 +86,7 @@ router.post("/login", (req, res) => {
                         console.log(user);
                         const validImg = user.image != null && user.image.length > 0 ? user.image : '';
                         const addSession = new Session({
+                            createdAt: new Date(),
                             useragent: req.headers['user-agent'],
                             email: email,
                             firstName: user.firstName,
@@ -95,7 +96,6 @@ router.post("/login", (req, res) => {
                             ip: req.connection.remoteAddress,
                             token: token,
                             valid: true,
-                            expiry: date.toISOString() // expire day after creation if not logged out
                         });
                         addSession.save(function (err, session) {
                             if (err) return console.error(err);
