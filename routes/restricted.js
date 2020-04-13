@@ -34,21 +34,22 @@ router.post("/getstats", passport.authenticate('jwt', {session: false}), (req, r
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
-    console.log(req);
-
     Session.findOne({ token: token }).then((session) => {
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('dashboard data retrieved session - restricted route');
+
             Promise.all([
                 User.find().estimatedDocumentCount(),
-                Session.find().estimatedDocumentCount()
-            ]).then(counts => {
-                console.log(counts);
+                Session.find().estimatedDocumentCount(),
+                User.find(null,'createdAt',)
+            ]).then(results => {
                 res.json({
-                    numberOfUsers: counts[0],
-                    numberLoggedIn: counts[1]
+                    numberOfUsers: results[0],
+                    numberLoggedIn: results[1],
+                    userRegChart: results[2]
                 })
             })
+            
         }
     })
 });
