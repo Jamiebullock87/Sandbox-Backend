@@ -17,29 +17,51 @@ app.use(
 );
 app.use(bodyParser.json());
 
-// Socket IO 
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
-io.on('connection', function(socket){
-    io.emit('user connected', 'Jamie');
-    socket.on('connect', function(user){
-        console.log('a user connected');
-    });
+// Websocket
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({
+    port: 8000,
+    perMessageDeflate: false
+});
 
-    socket.on('user-join', function(user) {
-        io.emit('user-join')
+// Need to extend this more to allow auth and user recognition
+// Perhaps with tokens?
+wss.on('connection', function connection(ws) {
+    ws.send('User Connected');
+    ws.on('message', function incoming(message) {
+        console.log('received: %s', message);
+        ws.send(message);
     });
-
-    socket.on('chat-message', (message) => {
-        console.log('Received a message', message)
-        io.emit('chat-message', message);
-    });
-
-    socket.on('disconnect', function(){
-        console.log('User Disconnected');
+    ws.on('open', function open() {
+        ws.send('something');
     });
 });
-io.listen(8000);
+
+
+
+// Socket IO 
+// const http = require('http').Server(app);
+// const io = require('socket.io')(http);
+// io.on('connection', function(socket){
+//     io.emit('user connected', 'Jamie');
+//     socket.on('connect', function(user){
+//         console.log('a user connected');
+//     });
+
+//     socket.on('user-join', function(user) {
+//         io.emit('user-join')
+//     });
+
+//     socket.on('chat-message', (message) => {
+//         console.log('Received a message', message)
+//         io.emit('chat-message', message);
+//     });
+
+//     socket.on('disconnect', function(){
+//         console.log('User Disconnected');
+//     });
+// });
+// io.listen(8000);
 
 // DB Config
 const db = require('./config/keys').mongoURI;
