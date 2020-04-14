@@ -18,18 +18,30 @@ app.use(
 app.use(bodyParser.json());
 
 // Socket IO 
-// const http = require('http').Server(app);
-// const io = require('socket.io')(http);
-// io.on('connection', function(socket){
-//     console.log('a user connected');
-//     socket.on('disconnect', function(){
-//         console.log('User Disconnected');
-//     });
-//     socket.on('message', (message, callback) => {
-//         callback(message);
-//     });
-// });
-// io.listen(8000);
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+io.on('connection', function(socket){
+    
+    socket.broadcast.emit('A User Connected');
+
+    socket.on('connect', function(){
+        console.log('a user connected');
+    });
+
+    socket.on('event', function(data){
+        console.log('server received message')
+    });
+
+    socket.on('message', (message) => {
+        console.log('Received a message', message)
+        io.emit('message', message);
+    });
+
+    socket.on('disconnect', function(){
+        console.log('User Disconnected');
+    });
+});
+io.listen(8000);
 
 // DB Config
 const db = require('./config/keys').mongoURI;
