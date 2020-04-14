@@ -21,20 +21,18 @@ app.use(bodyParser.json());
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 io.on('connection', function(socket){
-    
-    socket.broadcast.emit('A User Connected');
-
-    socket.on('connect', function(){
+    io.emit('user connected', 'Jamie');
+    socket.on('connect', function(user){
         console.log('a user connected');
     });
 
-    socket.on('event', function(data){
-        console.log('server received message')
+    socket.on('user-join', function(user) {
+        io.emit('user-join')
     });
 
-    socket.on('message', (message) => {
+    socket.on('chat-message', (message) => {
         console.log('Received a message', message)
-        io.emit('message', message);
+        io.emit('chat-message', message);
     });
 
     socket.on('disconnect', function(){
