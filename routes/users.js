@@ -83,7 +83,6 @@ router.post("/login", (req, res) => {
                         // create session if token gets signed
                         const date = new Date();
                         date.setDate(date.getDate() + 1);
-                        console.log(user);
                         const validImg = user.image != null && user.image.length > 0 ? user.image : '';
                         const addSession = new Session({
                             createdAt: new Date(),
