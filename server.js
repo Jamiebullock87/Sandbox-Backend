@@ -8,6 +8,8 @@ const passport = require("passport");
 const users = require('./routes/users');
 const restricted = require('./routes/restricted');
 
+require('dotenv').config();
+
 // Bodyparser middleware
 app.use(
     bodyParser.urlencoded({
