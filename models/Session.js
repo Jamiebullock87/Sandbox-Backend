@@ -1,49 +1,49 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const {DataTypes} = require('sequelize');
+const db = require('../database');
 
-// Create Schema
-const SessionSchema = new Schema({
+const Session = db.define('Session', {
     createdAt: {
-        type: Date,
-        default: Date.now,
-        index: { expires: '43200s' } // 12 hour sessions
+        type: DataTypes.DATE,
+        defaultValue: Date.now
     },
     useragent: {
-        type: String,
+        type: DataTypes.STRING,
         required: true
     },
     email: {
-        type: String,
+        type: DataTypes.STRING,
         required: true
     },
     firstName: {
-        type: String,
+        type: DataTypes.STRING,
         required: false
     },
     lastName: {
-        type: String,
+        type: DataTypes.STRING,
         required: false
     },
     image: {
-        type: String,
+        type: DataTypes.STRING,
         required: false
     },
     whatTheme: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        required: false
     },
     ip: {
-        type: String,
+        type: DataTypes.STRING,
         required: true
     },
     token: {
-        type: String,
+        type: DataTypes.STRING,
         required: true
     },
     valid: {
-        type: Boolean,
+        type: DataTypes.BOOLEAN,
         required: true
-    },
+    }
+}, {
+    // Other options
 });
 
-module.exports = Session = mongoose.model("sessions", SessionSchema);
+module.exports = Session;

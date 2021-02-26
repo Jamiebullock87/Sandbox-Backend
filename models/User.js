@@ -1,39 +1,44 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-// Create Schema
-const UserSchema = new Schema({
+const {DataTypes} = require('sequelize');
+const db = require('../database');
+
+const User = db.define('User', {
     firstName: {
-        type: String,
-        required: false,
-        default: '',
+        type: DataTypes.STRING,
+        allowNull: true
     },
     lastName: {
-        type: String,
-        required: false,
-        default: '',
+        type: DataTypes.STRING,
+        allowNull: true
     },
     image: {
-        type: String,
-        required: false,
-        default: '',
+        type: DataTypes.STRING,
+        allowNull: true
     },
     whatTheme: {
-        type: String,
+        type: DataTypes.STRING,
         required: false,
-        default: 'dark',
+        defaultValue: 'dark',
     },
     email: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         required: true
     },
     password: {
-        type: String,
+        type: DataTypes.STRING,
+        allowNull: false,
         required: true
     },
     isSuper: {
-        type: Boolean,
-        default: false,
-        required: false
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        required: true,
+        allowNull: false
     }
-}, {timestamps: true});
-module.exports = User = mongoose.model("users", UserSchema);
+}, {
+    // tableName: 'Users'
+});
+
+console.log(User === db.models.User); // true
+
+module.exports = User;

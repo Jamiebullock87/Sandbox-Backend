@@ -1,35 +1,36 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-// Create Schema
-const ClientSchema = new Schema({
+const {DataTypes} = require('sequelize');
+const db = require('../database');
+
+const Client = db.define('Client', {
     identifier: {
-        type: String,
+        type: DataTypes.STRING,
         required: true,
-        default: ''
+        defaultValue: ''
     },
     name: {
-        type: String,
+        type: DataTypes.STRING,
         required: true,
-        default: '',
+        defaultValue: ''
     },
     telephone: {
-        type: Number,
-        required: false,
-        default: '',
+        type: DataTypes.INTEGER,
+        required: false
     },
     contact: {
-        type: String,
+        type: DataTypes.STRING,
         required: false,
-        default: '',
+        defaultValue: ''
     },
     directTelephone: {
-        type: Number,
-        required: false,
-        default: ''
+        type: DataTypes.INTEGER,
+        required: false
     },
     email: {
-        type: String,
-        required: true
+        type: DataTypes.STRING,
+        required: true,
+        defaultValue: ''
     },
-}, {timestamps: true});
-module.exports = Client = mongoose.model("clients", ClientSchema);
+}, {
+    // Other options
+});
+module.exports = Client;

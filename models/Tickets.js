@@ -1,31 +1,38 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
-// Create Schema
-const TicketSchema = new Schema({
+const {DataTypes} = require('sequelize');
+const db = require('../database');
+
+const Tickets = db.define('Tickets', {
     title: {
-        type: String,
+        type: DataTypes.STRING,
         required: true,
         default: ''
     },
     identifier: {
-        type: String,
+        type: DataTypes.STRING,
         required: true,
         default: ''
     },
     client: {
-        type: String,
+        type: DataTypes.STRING,
         required: true,
         default: ''
     },
     raised: {
-        type: String,
+        type: DataTypes.STRING,
         required: true,
         default: ''
     },
     title: {
-        type: String,
+        type: DataTypes.STRING,
         required: true,
         default: ''
     },
-}, {timestamps: true});
-module.exports = Ticket = mongoose.model("tickets", TicketSchema);
+    body: {
+        type: DataTypes.STRING,
+        required: true,
+        default: ''
+    }
+}, {
+    // Other options
+});
+module.exports = Tickets;

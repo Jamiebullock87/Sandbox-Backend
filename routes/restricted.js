@@ -8,12 +8,12 @@ const sgMail = require('@sendgrid/mail');
 // Load input validation
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
-// Load User model
+// Load Models
 const User = require("../models/User");
-// Load Session model
 const Session = require("../models/Session");
-// Load Client model
 const Client = require("../models/Client");
+
+// Set Up API Restricted Routes
 
 // @route GET api/restricted/authcheck
 // @desc simple auth check to access dashboard
@@ -30,35 +30,33 @@ router.get("/authcheck", passport.authenticate('jwt', {session: false}), (req, r
     })
 });
 
-// @route GET api/restricted/getstats
+// @route POST api/restricted/getstats
 // @desc fetch the data to populate the dashboard
 // @access Private
 router.post("/getstats", passport.authenticate('jwt', {session: false}), (req, res) => {
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
+    console.log(req.headers);
     Session.findOne({ token: token }).then((session) => {
+        console.log(session);
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('dashboard data retrieved session - restricted route');
 
             Promise.all([
-                User.find().estimatedDocumentCount(),
-                Session.find().estimatedDocumentCount(),
-                User.find(null,'createdAt',)
+                User.findAndCountAll(),
+                Session.findAndCountAll(),
             ]).then(results => {
                 res.json({
                     numberOfUsers: results[0],
                     numberLoggedIn: results[1],
-                    userRegChart: results[2]
                 })
             })
-            
         }
     })
 });
 
-
-// @route GET api/restricted/getprofile
+// @route POST api/restricted/getprofile
 // @desc get the user profile and return the data
 // @access Private
 router.post("/getprofile", passport.authenticate('jwt', {session: false}), (req, res) => {
@@ -117,7 +115,7 @@ router.post("/saveprofile", passport.authenticate('jwt', {session: false}), (req
     });     
 });
 
-// @route GET api/restricted/getclients
+// @route POST api/restricted/getclients
 // @desc get the list of clients and return the data
 // @access Private
 router.post("/getclients", passport.authenticate('jwt', {session: false}), (req, res) => {
@@ -139,7 +137,7 @@ router.post("/getclients", passport.authenticate('jwt', {session: false}), (req,
     })
 });
 
-// @route GET api/restricted/addclient
+// @route POST api/restricted/addclient
 // @desc add the client to the database
 // @access Private
 router.post("/addclient", passport.authenticate('jwt', {session: false}), (req, res) => {

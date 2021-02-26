@@ -4,6 +4,7 @@ const cors = require('cors')
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const passport = require("passport");
+const { Client } = require('pg');
 
 const users = require('./routes/users');
 const restricted = require('./routes/restricted');
@@ -46,19 +47,42 @@ io.on('connection', function(socket){
 });
 io.listen(8000);
 
+
+// Mongo DB Connections
 // DB Config
-const db = require('./config/keys').mongoURI;
+// const db = require('./config/keys').mongoURI;
 // Connect to MongoDB
-mongoose
-.connect(
-    db,
-    { useNewUrlParser: true, useUnifiedTopology: true }
-)
-.then(() => console.log('MongoDB successfully connected'))
-.catch(err => console.log(err));
+// mongoose
+// .connect(
+    // db,
+    // { useNewUrlParser: true, useUnifiedTopology: true }
+// )
+// .then(() => console.log('MongoDB successfully connected'))
+// .catch(err => console.log(err));
 
 // Make Mongoose use `findOneAndUpdate()`.
-mongoose.set('useFindAndModify', false);
+// mongoose.set('useFindAndModify', false);
+
+// End of Mongo DB
+
+// Postgres Connection
+
+let db = require('./database');
+db.model = require('./models/index');
+db.sync({ force: true })
+// .then(() => {
+//     console.log("Drop and re-sync db.");
+//     UserModel.bulkCreate([
+//         {firstName: 'Jamie',lastName: 'bullock',image: 'testimg',whatTheme: 'dark',email: 'jamiebullock1987@gmail.com',password: 'badger',isSuper: true}
+//     ]).then(function() {
+//         return UserModel.findAll();
+//     }).then(function(notes) {
+//         console.log(notes);
+//     });
+
+// });
+
+// End of Postgres Connections
 
 // Passport middleware
 app.use(passport.initialize());
