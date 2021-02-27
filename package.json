@@ -26,7 +26,7 @@
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "sequelize": "^6.4.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "validator": "^12.1.0",
     "ws": "^7.2.3"
   },
