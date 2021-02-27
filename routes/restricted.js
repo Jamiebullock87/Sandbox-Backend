@@ -22,7 +22,7 @@ router.get("/authcheck", passport.authenticate('jwt', {session: false}), (req, r
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
-    Session.findOne({ token: token }).then((session) => {
+    Session.findOne({where: {token: token} }).then((session) => {
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('dashboard retrieved session - restricted route');
             return res.sendStatus(200);
@@ -37,9 +37,7 @@ router.post("/getstats", passport.authenticate('jwt', {session: false}), (req, r
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
-    console.log(req.headers);
-    Session.findOne({ token: token }).then((session) => {
-        console.log(session);
+    Session.findOne({where: {token: token} }).then((session) => {
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('dashboard data retrieved session - restricted route');
 
@@ -64,12 +62,10 @@ router.post("/getprofile", passport.authenticate('jwt', {session: false}), (req,
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
-    Session.findOne({ token: token }).then((session) => {
-        console.log(session);
+    Session.findOne({where: {token: token} }).then((session) => {
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('getprofile session valid');
-            User.findOne({ email: session.email }).then((user) => {
-                console.log(user);
+            User.findOne({where: {email: session.email} }).then((user) => {
                 return res.json({
                     firstName: user.firstName,
                     lastName: user.lastName,
@@ -89,23 +85,34 @@ router.post("/saveprofile", passport.authenticate('jwt', {session: false}), (req
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
+
+    // Book.update(
+    //     {title: req.body.title},
+    //     {where: req.params.bookId}
+    //   )
+    //   .then(function(rowsUpdated) {
+    //     res.json(rowsUpdated)
+    //   })
+
     console.log(req.body);
-    Session.findOneAndUpdate({token: token}, {$set:{
+    Session.update({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         image: req.body.image,
         whatTheme: req.body.whatTheme
-    }}, {new: true}, (err, doc) => {
-        if (err) {
-            console.log("Something wrong when updating data!");
+    }, {returning: true, where: {token: token}})
+    .then(([ rowsUpdated, [updatedData] ]) => {
+        if (rowsUpdated) {
+            console.log("Session was updated!");
         }
-        console.log(doc);
-        User.findOneAndUpdate({email: doc.email}, {$set:{
-            firstName: doc.firstName,
-            lastName: doc.lastName,
-            image: doc.image,
-            whatTheme: doc.whatTheme
-        }}, {new: true}, (err, doc) => {
+        console.log(updatedData.dataValues);
+        User.update({
+            firstName: updatedData.dataValues.firstName,
+            lastName: updatedData.dataValues.lastName,
+            image: updatedData.dataValues.image,
+            whatTheme: updatedData.dataValues.whatTheme
+        }, {returning: true, where: {email: updatedData.dataValues.email}})
+        .then((err, doc) => {
             if (err) {
                 console.log("Something wrong when updating data!");
             }
@@ -123,7 +130,7 @@ router.post("/getclients", passport.authenticate('jwt', {session: false}), (req,
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
-    Session.findOne({ token: token }).then((session) => {
+    Session.findOne({where: {token: token} }).then((session) => {
         console.log(session);
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('getprofile session valid');
@@ -145,7 +152,7 @@ router.post("/addclient", passport.authenticate('jwt', {session: false}), (req, 
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
-    Session.findOne({ token: token }).then((session) => {
+    Session.findOne({where: {token: token} }).then((session) => {
         console.log(session);
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('addclient session valid');
@@ -177,7 +184,7 @@ router.post("/createticket", passport.authenticate('jwt', {session: false}), (re
     const token = req.headers.authorization.split(' ')[1];
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
-    Session.findOne({ token: token }).then((session) => {
+    Session.findOne({where: {token: token} }).then((session) => {
         if (ip === session.ip && ua == session.useragent && session.valid) {
             // Send the email to the client
             // Set sendgrid API Key

@@ -123,7 +123,7 @@ router.post("/login", (req, res) => {
 // @access Private
 router.post("/logout", (req, res) => {
     const id = req.headers.authorization.split('Bearer ')[1];
-    Session.deleteOne({token: id}, (err, result) => {
+    Session.destroy({where: {token: id} }).then((err, result) => {
         if (err) {
             res.send(err);
         } else {
