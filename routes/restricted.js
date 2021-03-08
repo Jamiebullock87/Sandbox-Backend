@@ -111,13 +111,13 @@ router.post("/saveprofile", passport.authenticate('jwt', {session: false}), (req
             lastName: updatedData.dataValues.lastName,
             image: updatedData.dataValues.image,
             whatTheme: updatedData.dataValues.whatTheme
-        }, {returning: true, where: {email: updatedData.dataValues.email}})
-        .then((err, doc) => {
-            if (err) {
-                console.log("Something wrong when updating data!");
+        }, {returning: ['firstName', 'lastName', 'image', 'whatTheme'], where: {email: updatedData.dataValues.email}})
+        .then(([ rowsUpdated, [updatedData] ]) => {
+            if (rowsUpdated) {
+                console.log("Profile was updated");
             }
-            console.log(doc);
-            return res.json(doc);
+            console.log(updatedData.dataValues);
+            return res.json(updatedData.dataValues);
         });
     });     
 });
