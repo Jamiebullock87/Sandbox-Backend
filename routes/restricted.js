@@ -4,7 +4,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../config/keys");
 const passport = require("passport");
-const sgMail = require('@sendgrid/mail');
 // Load input validation
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
@@ -186,15 +185,13 @@ router.post("/createticket", passport.authenticate('jwt', {session: false}), (re
     const ip = req.connection.remoteAddress;
     Session.findOne({where: {token: token} }).then((session) => {
         if (ip === session.ip && ua == session.useragent && session.valid) {
-            // Send the email to the client
-            // Set sendgrid API Key
-            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+            // Would send an email potentially, for now though, just return what would have been sent to the front end
             const msg = {
                 to: req.body.to,
                 from: 'jamiebullock1987@gmail.com',
                 subject: req.body.subject,
                 html: req.body.message,
-              };
+            };
 
             // Comment this out for development - its using my personal email so could get flagged as spam
             // sgMail.send(msg);
