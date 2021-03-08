@@ -2,9 +2,11 @@ const express = require("express");
 const app = express();
 const cors = require('cors')
 const bodyParser = require("body-parser");
+const fileUpload = require('express-fileupload');
 const passport = require("passport");
 const users = require('./routes/users');
 const restricted = require('./routes/restricted');
+
 
 require('dotenv').config();
 
@@ -17,12 +19,17 @@ app.use(
 );
 app.use(bodyParser.json());
 
+app.use(fileUpload({
+    limits: { fileSize: 500 * 2500 * 1500 },
+}));
 
 // Postgres Connection
 
 let db = require('./database');
 db.model = require('./models/index');
-db.sync({ force: true })
+// Leave this commented out if working on the front end and need persistant db data
+// Uncomment to sync db with code usefull when adding to the api, can just create a few new things in insomnia
+// db.sync({ force: true })
 
 // End of Postgres Connections
 

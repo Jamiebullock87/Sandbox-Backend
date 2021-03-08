@@ -8,9 +8,7 @@ const passport = require("passport");
 const validateRegisterInput = require("../validation/register");
 const validateLoginInput = require("../validation/login");
 // Load Models
-const User = require("../models/User");
-const Session = require("../models/Session");
-const Client = require("../models/Client");
+const { User, Session, Client, Ticket }  = require("../models/index.js");
 
 // Set Up API Restricted Routes
 
@@ -85,15 +83,7 @@ router.post("/saveprofile", passport.authenticate('jwt', {session: false}), (req
     const ua = req.headers['user-agent'];
     const ip = req.connection.remoteAddress;
 
-    // Book.update(
-    //     {title: req.body.title},
-    //     {where: req.params.bookId}
-    //   )
-    //   .then(function(rowsUpdated) {
-    //     res.json(rowsUpdated)
-    //   })
-
-    console.log(req.body);
+    console.log(req.body.firstName);
     Session.update({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
@@ -102,6 +92,7 @@ router.post("/saveprofile", passport.authenticate('jwt', {session: false}), (req
     }, {returning: true, where: {token: token}})
     .then(([ rowsUpdated, [updatedData] ]) => {
         if (rowsUpdated) {
+            console.log(rowsUpdated);
             console.log("Session was updated!");
         }
         console.log(updatedData.dataValues);
@@ -121,6 +112,30 @@ router.post("/saveprofile", passport.authenticate('jwt', {session: false}), (req
     });     
 });
 
+// @route POST api/restricted/uploadimage
+// @desc uploads the profile image and moves it to public directory.
+// @access Private
+router.post("/uploadimage", passport.authenticate('jwt', {session: false}), (req, res) => {
+    console.log('reached restricted route');
+    const token = req.headers.authorization.split(' ')[1];
+    const ua = req.headers['user-agent'];
+    const ip = req.connection.remoteAddress;
+    Session.findOne({where: {token: token} }).then((session) => {
+        if (ip === session.ip && ua == session.useragent && session.valid) {
+            console.log('uploadimage session valid');
+            // TODO - save the image file in the user profile
+            // TODO - add some security and validation - currently no checks on file type or anything
+            User.findOne({where: {email: session.email} }).then((user) => {
+                let imageFile = req.files.file;
+                imageFile.mv(`/Users/jamieBullock/sites/Pied-Piper/front-end/public/${req.body.filename}.jpg`, function(err) {
+                    return res.json({file: `/Users/jamieBullock/sites/Pied-Piper/front-end/public/${req.body.filename}.jpg`});
+                })
+            })
+        }
+    })
+            
+});
+
 // @route POST api/restricted/getclients
 // @desc get the list of clients and return the data
 // @access Private
@@ -133,7 +148,7 @@ router.post("/getclients", passport.authenticate('jwt', {session: false}), (req,
         console.log(session);
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('getprofile session valid');
-            Client.find({}, 'identifier name contact telephone').then((clients) => {
+            Client.findAll().then((clients) => {
                 console.log(clients);
                 return res.json({
                     clients
@@ -155,7 +170,7 @@ router.post("/addclient", passport.authenticate('jwt', {session: false}), (req, 
         console.log(session);
         if (ip === session.ip && ua == session.useragent && session.valid) {
             console.log('addclient session valid');
-            Client.findOne({ identifier: req.body.identifier }).then(client => {
+            Client.findOne({ where: {identifier: req.body.identifier} }).then(client => {
                 if (client) {
                     return res.status(400).json({ identifier: "Identifier already exists" });
                 } else {
@@ -192,12 +207,10 @@ router.post("/createticket", passport.authenticate('jwt', {session: false}), (re
                 subject: req.body.subject,
                 html: req.body.message,
             };
-
-            // Comment this out for development - its using my personal email so could get flagged as spam
-            // sgMail.send(msg);
-
-            // Add ticket data to the database..
             
+            // TODO -
+            // Save to the database
+            // Error handling
 
             // Return to say what would have been sent...
             return res.json({
